@@ -6,6 +6,10 @@
 </p>
 
 <p align="center">
+  <a href="https://truhnlab.github.io/RadiographMorphometryAgent/"><b>Project Page</b></a>
+</p>
+
+<p align="center">
   <img src="docs/assets/overview.png" alt="The assistant with a lateral knee radiograph, its landmarks and the drafted report" width="100%">
 </p>
 
