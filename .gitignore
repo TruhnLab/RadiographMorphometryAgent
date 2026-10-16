@@ -1,0 +1,40 @@
+# --- secrets / local config (NEVER commit) ---
+.env
+.env.*
+!.env.example
+deploy.config
+
+# --- python ---
+__pycache__/
+*.pyc
+.venv/
+
+# --- runtime artifacts (may contain patient data / generated reports) ---
+uploads/
+reports/
+audit/
+certs/
+eval_runs/
+# recorded sessions: manifests, rosters, event streams (reader ids, timings, reports)
+studies/
+study_runs/
+
+# --- node / build ---
+node_modules/
+dist/
+
+# --- editor / harness config ---
+.claude/
+
+# --- sample data: radiographs + their derived outputs may be patient-derived.
+#     Keep only the README; add vetted, de-identified samples locally. ---
+examples/*
+!examples/README.md
+
+# --- source literature: large, licensed PDFs. Ingested into the guideline corpus, never
+#     committed (size + redistribution rights). ---
+literature/
+
+# --- local working documents in the repo root + Office lock files ---
+/*.docx
+~$*

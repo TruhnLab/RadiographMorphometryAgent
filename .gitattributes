@@ -1,0 +1,10 @@
+# Shell scripts and the entrypoint must stay LF, or WSL/Docker bash chokes on the CR.
+*.sh            text eol=lf
+docker/entrypoint.sh text eol=lf
+# Windows batch files are CRLF.
+*.bat           text eol=crlf
+
+*.ipynb filter=nbstripout
+*.zpln filter=nbstripout
+*.ipynb diff=ipynb
+ops/hooks/*     text eol=lf

@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Lightweight markdown styling for the rendered report (no typography plugin). */
+.report-md h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.75rem;
+}
+.report-md h2 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #0ea5e9;
+  margin: 1.25rem 0 0.4rem;
+}
+.report-md p {
+  margin: 0.4rem 0;
+  line-height: 1.6;
+}
+.report-md ul {
+  margin: 0.3rem 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+.report-md li {
+  margin: 0.2rem 0;
+  line-height: 1.55;
+}
+.report-md strong {
+  color: #0f172a;
+}
+
+/* Compact markdown for chat bubbles. */
+.chat-md > :first-child {
+  margin-top: 0;
+}
+.chat-md > :last-child {
+  margin-bottom: 0;
+}
+.chat-md p {
+  margin: 0.4rem 0;
+  line-height: 1.55;
+}
+.chat-md strong {
+  font-weight: 600;
+}
+.chat-md ul,
+.chat-md ol {
+  margin: 0.3rem 0;
+  padding-left: 1.1rem;
+}
+.chat-md ul {
+  list-style: disc;
+}
+.chat-md ol {
+  list-style: decimal;
+}
+.chat-md li {
+  margin: 0.15rem 0;
+}
+.chat-md h1,
+.chat-md h2,
+.chat-md h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0.25rem;
+}
+.chat-md code {
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: 4px;
+  padding: 0.05rem 0.3rem;
+  font-size: 0.85em;
+}
+.chat-md a {
+  color: #0284c7;
+  text-decoration: underline;
+}
+
+/* Measurement chip strip: a slim horizontal scrollbar that fits inside the row's fixed
+   height, so the row never becomes vertically scrollable as well. */
+.chip-row {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(203 213 225) transparent;
+}
+.chip-row::-webkit-scrollbar {
+  height: 5px;
+}
+.chip-row::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chip-row::-webkit-scrollbar-thumb {
+  background: rgb(203 213 225);
+  border-radius: 999px;
+}
