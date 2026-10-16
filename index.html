@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Radiograph Morphometry Agent</title>
+  <meta name="author" content="Dennis Eschweiler, Sven Nebelung">
+  <meta name="description" content="An LLM agent that drafts structured reports for musculoskeletal radiographs. Every measurement comes from automated morphometry and every reference range from retrieved guideline text.">
+  <meta name="theme-color" content="#f1f3f7">
+  <meta property="og:title" content="Radiograph Morphometry Agent">
+  <meta property="og:description" content="An LLM agent that drafts grounded reports for musculoskeletal radiographs.">
+  <meta property="og:image" content="https://truhnlab.github.io/RadiographMorphometryAgent/assets/media/teaser.jpg">
+  <link rel="icon" href="assets/media/lab-logo.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/site.css?v=2">
+  <script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+  <header class="bar">
+    <div class="wide bar-inner">
+      <a class="lab" href="https://truhn.ai/">
+        <img src="assets/media/lab-logo.svg" alt="" width="30" height="30">
+        <span>Lab for Artificial Intelligence in Medicine</span>
+      </a>
+      <nav aria-label="On this page">
+        <a class="link" href="#method">Method</a>
+        <a class="link" href="#grounding">Grounding</a>
+        <a class="link" href="#views">Views</a>
+        <a class="link" href="#citation">Citation</a>
+        <a class="btn small" href="https://github.com/TruhnLab/RadiographMorphometryAgent">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.88.87 2.34.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0Z"/></svg>
+          Code
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ======================= header and teaser ======================= -->
+    <section class="hero wide">
+      <h1><span class="name">Radiograph Morphometry Agent</span> <span class="sub">Grounded reports for musculoskeletal radiographs</span></h1>
+      <p class="authors"><span>Dennis Eschweiler</span><span>Sven Nebelung</span></p>
+      <p class="byline"><a href="https://truhn.ai/">Lab for Artificial Intelligence in Medicine</a> <span style="white-space:nowrap">&nbsp;·&nbsp; October 2026</span></p>
+      <div class="links">
+        <a class="btn" href="https://github.com/TruhnLab/RadiographMorphometryAgent">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.88.87 2.34.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0Z"/></svg>
+          Code
+        </a>
+        <a class="btn" href="https://doi.org/10.1007/s00330-026-12555-y">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M4 1.75h5.5L12.25 4.5v9.75H4z"/><path d="M9.25 1.75V4.75h3M6 8h4.25M6 10.75h4.25"/></svg>
+          Morphometry paper
+        </a>
+        <a class="btn" href="https://github.com/TruhnLab/RadiographLandmarkMatching">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="4" cy="4" r="1.75"/><circle cx="12" cy="6" r="1.75"/><circle cx="6.5" cy="12.25" r="1.75"/><path d="M5.6 4.6l4.8 1M11 7.4l-3.4 3.5"/></svg>
+          Morphometry code
+        </a>
+      </div>
+      <figure class="teaser settle">
+        <div class="float">
+          <video id="teaser" src="assets/media/teaser.mp4" poster="assets/media/teaser.jpg" autoplay muted loop playsinline preload="auto"
+                 aria-label="Recording of the assistant. A lateral knee radiograph is analysed, the agent calls its tools, landmarks and measurements appear on the image, a reference range is traced to its guideline source and a question is answered in the chat."></video>
+        </div>
+        <ol class="chapters" id="chapters" aria-label="Parts of the video">
+          <li><button type="button" data-start="0"><span class="n">1</span>Agent<span class="fill"></span></button></li>
+          <li><button type="button" data-start="11.5"><span class="n">2</span>Morphometry<span class="fill"></span></button></li>
+          <li><button type="button" data-start="19.5"><span class="n">3</span>Guideline sources<span class="fill"></span></button></li>
+          <li><button type="button" data-start="24.5"><span class="n">4</span>Dialogue<span class="fill"></span></button></li>
+        </ol>
+        <figcaption class="note center">A recording of the running system with the demo guideline corpus. The interface is in German, and waiting times are shortened.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ======================= overview: abstract and method, on a band ======================= -->
+    <div class="band">
+    <section class="abstract wide">
+      <div class="narrow reveal">
+        <h2 class="small">Abstract</h2>
+        <p>Many measurements on musculoskeletal radiographs, such as patellar height or tibial slope, are still taken by
+          hand and then compared with reference ranges from the literature. Language models could draft such reports, but
+          they tend to produce numbers and thresholds of their own. We present an agent that leaves both to dedicated
+          services. A vision-language model assesses the radiograph and runs the case. A morphometry service places the
+          anatomical landmarks and computes every measurement. A guideline search supplies every reference range, and a
+          value is only interpreted when a retrieved passage defines its range. The model then writes a structured report
+          in which every value can be traced to its construction on the image and every range to its source. The
+          radiologist can ask questions, edit the impression and correct landmarks, and the report follows. Each service
+          can be replaced and run on local infrastructure, so radiographs do not have to leave the hospital. This is
+          ongoing work, and a reader study with radiologists is in preparation.</p>
+      </div>
+    </section>
+
+    <!-- ======================= method ======================= -->
+    <section id="method" class="wide">
+      <div class="head center narrow reveal">
+        <h2>Method</h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal" style="--d:0s">
+          <div class="pic"><img src="assets/media/assess.jpg" alt="The agent's steps in the chat. It assesses the image as a lateral view of the knee and starts the morphometry" loading="lazy" width="920" height="576"></div>
+          <div class="txt"><h3><span>1</span>Image assessment</h3><p>The language model looks at a downsampled copy of
+            the radiograph and names body region and projection. The radiologist can change both before the measurements
+            start.</p></div>
+        </div>
+        <div class="step reveal" style="--d:.08s">
+          <div class="pic"><img src="assets/media/morpho.jpg" alt="Lateral knee radiograph with the landmarks and the construction of the Insall-Salvati index" loading="lazy" width="852" height="532"></div>
+          <div class="txt"><h3><span>2</span>Morphometry</h3><p>The morphometry service matches the image against annotated
+            reference radiographs, places the landmarks and computes every measurement of the view. The constructions are
+            drawn on the image.</p></div>
+        </div>
+        <div class="step reveal" style="--d:.16s">
+          <div class="pic"><img src="assets/media/source.jpg" alt="The report with the measured values. Below the tibial slope, the guideline passage its reference range comes from" loading="lazy" width="920" height="576"></div>
+          <div class="txt"><h3><span>3</span>Guideline search</h3><p>For each measurement the agent searches the guideline
+            corpus. Only a value with a retrieved reference range is interpreted, and the range links to its passage.
+            Other values are reported as measured.</p></div>
+        </div>
+        <div class="step reveal" style="--d:.24s">
+          <div class="pic"><img src="assets/media/dialog.jpg" alt="The chat. The radiologist asks about the abnormal values and the agent answers with the retrieved range" loading="lazy" width="1184" height="740"></div>
+          <div class="txt"><h3><span>4</span>Report and dialogue</h3><p>The model drafts a structured report and answers
+            questions in the chat. After a landmark correction the measurements update, and the agent checks the report
+            against the new values.</p></div>
+        </div>
+      </div>
+      <div class="step-next reveal">
+        <h3>Reader study <em>In preparation</em></h3>
+        <p>A reader study with radiologists will evaluate the drafted reports. Results will be added here.</p>
+      </div>
+    </section>
+    </div>
+
+    <!-- ======================= grounding ======================= -->
+    <section id="grounding" class="wide">
+      <div class="head center narrow reveal">
+        <h2>Who supplies what</h2>
+        <p class="explain">The language model plans the case and writes the text, but it never supplies a number or a
+          threshold of its own. Every measurement comes from the morphometry service, and every reference range comes from
+          the guideline search. A value without a retrieved range is reported but not interpreted. The radiologist can
+          also edit the report directly, and later updates keep their wording.</p>
+      </div>
+      <figure class="float flow settle" id="flow">
+        <div class="flow-scroll">
+          <svg viewBox="0 0 1100 470" role="img" aria-labelledby="flowTitle">
+            <title id="flowTitle">The radiograph goes to the language model. The model calls the morphometry service, which places the landmarks and returns the measurements, and the guideline search, which returns the reference ranges. It then writes the report, in which the numbers come from morphometry and the ranges from the guidelines. The radiologist asks questions and also edits the report directly.</title>
+            <defs>
+              <clipPath id="clipXray"><rect x="20" y="115" width="220" height="220" rx="16"/></clipPath>
+              <clipPath id="clipEdit"><rect id="editClip" x="720" y="300" width="400" height="26"/></clipPath>
+              <filter id="soft" x="-20%" y="-20%" width="140%" height="160%">
+                <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0e1626" flood-opacity=".12"/>
+              </filter>
+            </defs>
+
+            <!-- connectors -->
+            <g class="wires">
+              <path id="pImg" d="M240 225 H340"/>
+              <path id="pMOut" d="M445 170 V104"/>
+              <path id="pMIn" d="M475 104 V170"/>
+              <path id="pGOut" d="M445 280 V346"/>
+              <path id="pGIn" d="M475 346 V280"/>
+              <path id="pRep" d="M580 225 H700"/>
+              <path id="pAsk" d="M700 422 C640 422 640 262 580 256"/>
+              <path id="pEdit" d="M885 392 V350"/>
+            </g>
+
+            <!-- radiograph, with the landmarks and the tibial slope construction the morphometry service returned -->
+            <g class="node" id="nImg">
+              <rect x="20" y="115" width="220" height="220" rx="16" fill="#000" filter="url(#soft)"/>
+              <g clip-path="url(#clipXray)">
+                <image href="assets/media/knee.jpg" x="20" y="115" width="220" height="220"/>
+                <g id="marks">
+                  <circle class="lm" data-n="0" cx="108.7" cy="131.6" r="3.6"/>
+                  <circle class="lm" data-n="1" cx="114.7" cy="132.9" r="3.6"/>
+                  <circle class="lm" data-n="2" cx="108.0" cy="169.8" r="3.6"/>
+                  <circle class="lm" data-n="3" cx="93.3" cy="178.0" r="3.6"/>
+                  <circle class="lm on" data-n="4" cx="122.0" cy="197.7" r="3.6"/>
+                  <circle class="lm" data-n="5" cx="129.6" cy="200.9" r="3.6"/>
+                  <circle class="lm" data-n="6" cx="114.5" cy="202.0" r="3.6"/>
+                  <circle class="lm" data-n="7" cx="136.7" cy="202.8" r="3.6"/>
+                  <circle class="lm" data-n="8" cx="144.9" cy="205.7" r="3.6"/>
+                  <circle class="lm" data-n="9" cx="159.5" cy="207.3" r="3.6"/>
+                  <circle class="lm" data-n="10" cx="152.7" cy="207.4" r="3.6"/>
+                  <circle class="lm on" data-n="11" cx="167.5" cy="207.7" r="3.6"/>
+                  <circle class="lm" data-n="12" cx="102.6" cy="229.8" r="3.6"/>
+                  <circle class="lm on" data-n="13" cx="127.1" cy="268.3" r="3.6"/>
+                  <circle class="lm" data-n="14" cx="150.5" cy="269.6" r="3.6"/>
+                  <circle class="lm" data-n="15" cx="106.1" cy="278.9" r="3.6"/>
+                  <circle class="lm" data-n="16" cx="126.9" cy="280.3" r="3.6"/>
+                  <circle class="lm" data-n="17" cx="107.8" cy="284.0" r="3.6"/>
+                  <circle class="lm" data-n="18" cx="149.9" cy="288.3" r="3.6"/>
+                  <circle class="lm" data-n="19" cx="127.0" cy="295.3" r="3.6"/>
+                  <circle class="lm" data-n="20" cx="108.7" cy="296.5" r="3.6"/>
+                  <circle class="lm" data-n="21" cx="150.2" cy="302.4" r="3.6"/>
+                  <circle class="lm" data-n="22" cx="148.4" cy="312.8" r="3.6"/>
+                  <circle class="lm" data-n="23" cx="110.6" cy="313.4" r="3.6"/>
+                  <circle class="lm on" data-n="24" cx="128.5" cy="319.2" r="3.6"/>
+                </g>
+                <g id="cons">
+                  <path class="cl" d="M128.5 319.2 L127.1 268.3"/>
+                  <path class="cl" d="M122.0 197.7 L167.5 207.7"/>
+                  <path class="cl dash" d="M127.1 268.3 L125.3 198.5"/>
+                  <path class="cl dash" d="M125.3 198.5 L164.1 197.4"/>
+                  <path class="cl arc" d="M150.6 204.0 L150.6 203.7 L150.7 203.5 L150.7 203.2 L150.8 203.0 L150.8 202.7 L150.8 202.5 L150.9 202.2 L150.9 201.9 L151.0 201.7 L151.0 201.4 L151.0 201.2 L151.0 200.9 L151.1 200.6 L151.1 200.4 L151.1 200.1 L151.1 199.9 L151.1 199.6 L151.1 199.3 L151.2 199.1 L151.2 198.8 L151.2 198.6 L151.2 198.3 L151.2 198.0 L151.1 197.8"/>
+                  <text class="cl-label" x="170.4" y="195.0" text-anchor="middle">13.9&#176;</text>
+                </g>
+              </g>
+              <text class="label" x="130" y="362" text-anchor="middle">Radiograph</text>
+            </g>
+
+            <!-- tools -->
+            <g class="node tool morpho" id="nMorpho">
+              <rect class="card" x="340" y="20" width="240" height="84" rx="16" filter="url(#soft)"/>
+              <circle cx="366" cy="48" r="6" class="dot"/>
+              <text class="title" x="382" y="53">Morphometry service</text>
+              <text class="sub" x="366" y="80">landmarks and measurements</text>
+            </g>
+            <g class="node tool guide" id="nGuide">
+              <rect class="card" x="340" y="346" width="240" height="84" rx="16" filter="url(#soft)"/>
+              <circle cx="366" cy="374" r="6" class="dot"/>
+              <text class="title" x="382" y="379">Guideline search</text>
+              <text class="sub" x="366" y="406">reference ranges with sources</text>
+            </g>
+
+            <!-- the agent -->
+            <g class="node agent" id="nAgent">
+              <rect class="card" x="340" y="170" width="240" height="110" rx="18" filter="url(#soft)"/>
+              <text class="title big" x="460" y="214" text-anchor="middle">Language model</text>
+              <text class="sub status" id="status" x="460" y="244" text-anchor="middle">runs the case, writes the text</text>
+            </g>
+
+            <!-- the report -->
+            <g class="node report" id="nReport">
+              <rect class="card" x="700" y="80" width="370" height="270" rx="18" filter="url(#soft)"/>
+              <text class="title" x="726" y="114">Report draft</text>
+              <g class="row" id="r1"><text x="726" y="150"><tspan class="w">Insall-Salvati index</tspan> <tspan class="num">1.1</tspan> <tspan class="rng">(0.8 &#8211; 1.2)</tspan></text></g>
+              <g class="row" id="r2"><text x="726" y="178"><tspan class="w">Caton-Deschamps index</tspan> <tspan class="num">0.9</tspan> <tspan class="rng">(0.6 &#8211; 1.2)</tspan></text></g>
+              <g class="row" id="r3">
+                <rect class="hl" id="hl" x="716" y="188" width="338" height="27" rx="7"/>
+                <text x="726" y="206"><tspan class="w">Posterior tibial slope</tspan> <tspan class="num">13.9&#176; &#8593;</tspan> <tspan class="rng">(5&#176; &#8211; 10&#176;)</tspan></text>
+              </g>
+              <g class="row" id="r4">
+                <text class="cap" x="726" y="244">IMPRESSION</text>
+                <text class="w" x="726" y="268">The posterior tibial slope is increased.</text>
+                <text class="w" x="726" y="291">The patellar height indices are normal.</text>
+              </g>
+              <g class="row" id="r5" clip-path="url(#clipEdit)">
+                <text class="ed" x="726" y="318">No joint effusion.</text>
+              </g>
+              <rect class="caret" id="caret" x="726" y="303" width="2" height="19" rx="1"/>
+            </g>
+
+            <!-- the radiologist -->
+            <g class="node person" id="nPerson">
+              <rect class="card" x="700" y="392" width="370" height="62" rx="18" filter="url(#soft)"/>
+              <circle cx="732" cy="423" r="13" class="face"/>
+              <path d="M726.5 421.5a5.5 5.5 0 1 0 11 0a5.5 5.5 0 1 0-11 0M723 435c2-4 5.5-5.5 9-5.5s7 1.5 9 5.5" class="glyph"/>
+              <text class="title" x="756" y="419">Radiologist</text>
+              <text class="sub" id="personIdle" x="756" y="441">asks, edits the report and corrects landmarks</text>
+              <text class="sub act" id="personAsk" x="756" y="441">&#8220;Which values are abnormal?&#8221;</text>
+              <text class="sub act" id="personEdit" x="756" y="441">writes in the impression directly</text>
+            </g>
+
+            <!-- messages on the wires -->
+            <g class="chip" id="cMOut"><rect x="296" y="124" width="140" height="28" rx="14"/><text x="366" y="143" text-anchor="middle">knee, lateral</text></g>
+            <g class="chip num" id="cMIn"><rect x="484" y="124" width="150" height="28" rx="14"/><text x="559" y="143" text-anchor="middle">1.1 &#183; 0.9 &#183; 13.9&#176;</text></g>
+            <g class="chip" id="cGOut"><rect x="246" y="299" width="190" height="28" rx="14"/><text x="341" y="318" text-anchor="middle">&#8220;posterior tibial slope&#8221;</text></g>
+            <g class="chip rng" id="cGIn"><rect x="484" y="299" width="96" height="28" rx="14"/><text x="532" y="318" text-anchor="middle">5&#176; &#8211; 10&#176;</text></g>
+
+            <!-- moving dot -->
+            <circle class="pkt" id="dot" r="6"/>
+          </svg>
+        </div>
+        <p class="flow-hint">Swipe to see the whole diagram.</p>
+        <div class="flow-foot">
+          <span><i class="num"></i>Numbers from the morphometry service</span>
+          <span><i class="rng"></i>Ranges from the guideline search</span>
+          <span><i class="w"></i>Text from the language model</span>
+          <span><i class="ed"></i>Edits by the radiologist</span>
+        </div>
+      </figure>
+    </section>
+
+    <!-- ======================= views ======================= -->
+    <section id="views" class="wide">
+      <div class="head center narrow reveal">
+        <h2>Supported views</h2>
+        <p class="explain">The agent reads the supported views and their measurements from the morphometry service when it
+          starts, so a new view of the service needs no change to the agent. The reference implementation currently covers
+          six views.</p>
+      </div>
+      <div class="views">
+        <div class="view reveal" style="--d:0s"><h3>Knee <span>lateral</span></h3><p>Insall-Salvati ratio · modified Insall-Salvati ratio · Caton-Deschamps index · Blackburne-Peel ratio · patella morphology ratio · posterior tibial slope (three reference axes)</p></div>
+        <div class="view reveal" style="--d:.06s"><h3>Knee <span>axial</span></h3><p>Sulcus angle · congruence angle · patellar tilt angle · lateral patellofemoral angle</p></div>
+        <div class="view reveal" style="--d:.12s"><h3>Knee <span>AP</span></h3><p>Medial and lateral joint space width</p></div>
+        <div class="view reveal" style="--d:0s"><h3>Foot <span>AP</span></h3><p>Hallux valgus angle · intermetatarsal angles 1–2 and 1–5</p></div>
+        <div class="view reveal" style="--d:.06s"><h3>Foot <span>lateral</span></h3><p>Medial arch angle · talus–first metatarsal angle · calcaneal inclination angle</p></div>
+        <div class="view reveal" style="--d:.12s"><h3>Shoulder <span>AP</span></h3><p>Critical shoulder angle · lateral acromion angle · acromial index · acromiohumeral interval</p></div>
+      </div>
+    </section>
+
+    <!-- ======================= citation ======================= -->
+    <section id="citation" class="wide">
+      <div class="head center narrow reveal">
+        <h2>Citation</h2>
+        <p class="explain center-text">A paper on the agent is in preparation. Until then, please cite the morphometry framework.</p>
+      </div>
+      <div class="bib float reveal">
+        <button type="button" class="copy" id="copyBib">Copy</button>
+<pre id="bib"><code>@article{eschweiler2026landmark,
+  title   = {An Artificial Intelligence Framework for Universal Landmark Matching and Morphometry in Musculoskeletal Radiography},
+  author  = {Eschweiler, Dennis and Cornejo Merodio, Eneko and Barajas Ordonez, Felix and Lichev, Aleksandar and Ignatova, Nikol and von der St{\"u}ck, Marc Sebastian and Kuhl, Christiane and Truhn, Daniel and Nebelung, Sven},
+  journal = {European Radiology},
+  year    = {2026},
+  doi     = {10.1007/s00330-026-12555-y}
+}</code></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wide cols">
+      <div>
+        <p><a href="https://truhn.ai/">Lab for Artificial Intelligence in Medicine</a></p>
+        <p><a href="https://www.ukaachen.de/kliniken-institute/klinik-fuer-diagnostische-und-interventionelle-radiologie/klinik/">Department of Diagnostic and Interventional Radiology</a>, University Hospital RWTH Aachen</p>
+      </div>
+      <div>
+        <p>This is a research project and not a medical device. The code is released under the MIT license.</p>
+        <p>This page sets no cookies and loads no external resources.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="assets/js/site.js?v=2"></script>
+</body>
+</html>
