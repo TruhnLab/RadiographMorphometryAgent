@@ -54,7 +54,3 @@ A paper on the agent is in preparation. Until then, please cite the morphometry 
   doi     = {10.1007/s00330-026-12555-y}
 }
 ```
-
-## License
-
-MIT, see [LICENSE](LICENSE).
