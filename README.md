@@ -15,16 +15,22 @@
 
 ## Overview
 
-The language model runs the case, but it never supplies a number or a threshold of its
-own. Measurements come from
-[RadiographLandmarkMatching](https://github.com/TruhnLab/RadiographLandmarkMatching), and
-reference ranges come only from retrieved guideline passages. The radiologist can correct
-landmarks, and the report follows.
+The agent connects three services:
+
+- a **language model** (any OpenAI-compatible vision model) that runs the case and writes
+  the report
+- a **morphometry service**
+  ([RadiographLandmarkMatching](https://github.com/TruhnLab/RadiographLandmarkMatching))
+  that places the landmarks and computes every measurement
+- a **guideline search** (your own retrieval system or a folder of text files) that
+  supplies every reference range
+
+The language model never supplies a number or a threshold of its own. The radiologist can
+correct landmarks, and the report follows.
 
 ## Getting started
 
-You need Python 3.11+, Node.js 18+, an OpenAI-compatible vision model and the
-[morphometry service](https://github.com/TruhnLab/RadiographLandmarkMatching/tree/main/docker).
+You need Python 3.11+, Node.js 18+ and access to the three services above.
 
 ```bash
 pip install -r requirements.txt
@@ -32,8 +38,8 @@ cp .env.example .env        # model, guideline search and morphometry service
 python run.py               # open http://localhost:5173
 ```
 
-Each of the three services can be replaced, see [docs/configuration.md](docs/configuration.md).
-The interface and the reports are in German.
+Each service is configured in `.env` and can be replaced, see
+[docs/configuration.md](docs/configuration.md). The interface and the reports are in German.
 
 ## Citation
 
