@@ -61,33 +61,34 @@ if (copy) {
 // ---------- who supplies what: one case, played on a loop ----------
 // Times in seconds within one cycle. The model asks the tools, the landmarks and numbers come back from the
 // morphometry service (blue), the ranges from the guideline search (violet), and the model writes the text.
-// Then the radiologist asks a question and finally writes in the report directly (amber).
+// Then the radiologist types a question and finally writes in the report directly (amber).
 // The landmarks and the tibial slope construction on the radiograph are the ones the app drew for this case.
 const flow = $('#flow');
 if (flow) {
-  const CYCLE = 15.6;
-  const END = 14.6;   // everything fades out from here and the case starts again
+  const CYCLE = 16.4;
+  const END = 15.4;   // everything fades out from here and the case starts again
   const ON = [   // [from, to, node]: the node's outline is drawn while it works
     [0.1, 1.0, 'nImg'], [0.8, 1.9, 'nAgent'], [2.3, 3.5, 'nMorpho'], [3.8, 4.5, 'nAgent'], [5.0, 6.0, 'nGuide'],
-    [6.4, 7.3, 'nAgent'], [7.5, 9.3, 'nReport'], [9.3, 10.4, 'nPerson'], [10.2, 11.2, 'nAgent'], [11.0, 12.1, 'nReport'],
-    [12.2, 13.9, 'nPerson'], [12.9, 14.3, 'nReport'],
+    [6.4, 7.3, 'nAgent'], [7.5, 9.3, 'nReport'], [9.3, 11.0, 'nPerson'], [11.0, 12.0, 'nAgent'], [11.7, 12.8, 'nReport'],
+    [13.0, 14.7, 'nPerson'], [13.7, 15.1, 'nReport'],
   ];
   const PACKETS = [   // [from, to, wire, colour]
     [0.2, 0.9, 'pImg', 'var(--ink)'], [1.8, 2.35, 'pMOut', 'var(--ink)'], [3.35, 3.9, 'pMIn', 'var(--num)'],
     [4.4, 4.95, 'pGOut', 'var(--ink)'], [5.95, 6.5, 'pGIn', 'var(--rng)'], [7.0, 7.6, 'pRep', 'var(--ink)'],
-    [9.6, 10.3, 'pAsk', 'var(--person)'], [10.6, 11.1, 'pRep', 'var(--ink)'], [12.45, 12.95, 'pEdit', 'var(--person)'],
+    [10.55, 11.2, 'pAsk', 'var(--person)'], [11.3, 11.8, 'pRep', 'var(--ink)'], [13.25, 13.75, 'pEdit', 'var(--person)'],
   ];
   const CHIPS = [[1.75, 3.4, 'cMOut'], [3.3, 5.0, 'cMIn'], [4.35, 6.0, 'cGOut'], [5.9, 7.6, 'cGIn']];
   const STATUS = [
     [0.95, 1.75, 'assesses the image: knee, lateral'], [1.75, 4.3, 'calls the morphometry service'],
     [4.3, 6.9, 'looks up the reference ranges'], [6.9, 9.4, 'writes the report'],
-    [9.4, 12.2, 'answers from the same evidence'],
+    [9.4, 11.1, 'waits for the radiologist'], [11.1, 12.9, 'answers from the same evidence'],
   ];
   const IDLE = 'runs the case, writes the text';
   const ROWS = [[7.65, 'r1'], [7.95, 'r2'], [8.25, 'r3'], [8.7, 'r4']];
   const MARKS = [3.5, .024];        // first landmark, then one every 24 ms
   const DRAW = [4.15, 4.65];        // the construction is drawn
-  const TYPE = [13.0, 13.85];       // the radiologist types
+  const ASK = [9.45, 10.45];        // the radiologist types a question
+  const TYPE = [13.8, 14.65];       // ... and later a sentence into the impression
 
   const el = (id) => document.getElementById(id);
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -99,7 +100,18 @@ if (flow) {
   const marks = el('marks'), lms = $$('.lm', marks);
   const cons = el('cons'), solid = $$('.cl:not(.dash):not(.arc)', cons), label = $('.cl-label', cons);
   const fine = $$('.cl.dash, .cl.arc', cons);
-  const edit = $('#r5 text'), clip = el('editClip'), caret = el('caret');
+  const edit = $('#r5 text'), ask = el('personAsk');
+
+  // Reveal a text letter by letter through its clip rectangle, with a cursor after the last letter.
+  function type(text, clip, caret, t, [a, b], blinkUntil = b) {
+    const n = text.getNumberOfChars();
+    const typed = Math.round(clamp((t - a) / (b - a), 0, 1) * n);
+    const w = typed ? text.getSubStringLength(0, typed) : 0;
+    clip.setAttribute('width', typed ? w + 8 : 0);
+    caret.setAttribute('x', +text.getAttribute('x') + w + 1.5);
+    const blink = t >= b && t < blinkUntil && Math.floor((t - b) * 2.4) % 2 === 1;
+    caret.style.opacity = (t >= a - .1 && t < b) || blink ? 1 : 0;
+  }
 
   function draw(t) {
     for (const id of new Set(ON.map((o) => o[2])))
@@ -116,7 +128,7 @@ if (flow) {
     const s = STATUS.find(([a, b]) => t >= a && t < b);
     const text = s ? s[2] : IDLE;
     if (status.textContent !== text) status.textContent = text;
-    status.style.opacity = s ? win(t, s[0], s[1], .18) : (t < 0.95 ? win(t, -1, 0.95, .18) : win(t, 12.2, CYCLE + 1, .3));
+    status.style.opacity = s ? win(t, s[0], s[1], .18) : (t < STATUS[0][0] ? win(t, -1, STATUS[0][0], .18) : win(t, STATUS.at(-1)[1], CYCLE + 1, .3));
     const out = 1 - clamp((t - END) / .45, 0, 1);
 
     // landmarks pop in from top to bottom, then the tibial slope construction is drawn
@@ -141,22 +153,17 @@ if (flow) {
       el(id).style.opacity = ease(u) * out;
       el(id).setAttribute('transform', `translate(0 ${(1 - ease(u)) * 8})`);
     }
-    el('hl').style.opacity = win(t, 10.9, 12.1, .3);
+    el('hl').style.opacity = win(t, 11.7, 12.8, .3);
 
-    // the radiologist types a sentence into the impression
-    const n = edit.getNumberOfChars();
-    const typed = Math.round(clamp((t - TYPE[0]) / (TYPE[1] - TYPE[0]), 0, 1) * n);
-    const w = typed ? edit.getSubStringLength(0, typed) : 0;
-    clip.setAttribute('width', typed ? w + 8 : 0);
+    // the radiologist types a question of their own, and later a sentence into the impression
+    type(ask, el('askClip'), el('caretAsk'), t, ASK);
+    type(edit, el('editClip'), el('caret'), t, TYPE, END);
     el('r5').style.opacity = out;
-    caret.setAttribute('x', 726 + w + 1.5);
-    const typing = t >= TYPE[0] - .1 && t < TYPE[1];
-    caret.style.opacity = (typing || (t >= TYPE[1] && t < END && Math.floor((t - TYPE[1]) * 2.4) % 2 === 1)) ? 1 : 0;
 
-    const ask = win(t, 9.3, 11.4, .25), act = win(t, 12.2, 14.2, .25);
-    el('personAsk').style.opacity = ask;
-    el('personEdit').style.opacity = act;
-    el('personIdle').style.opacity = 1 - Math.max(ask, act);
+    const asking = win(t, 9.3, 11.5, .2), editing = win(t, 13.0, 15.0, .25);
+    ask.style.opacity = asking;
+    el('personEdit').style.opacity = editing;
+    el('personIdle').style.opacity = 1 - Math.max(asking, editing);
   }
 
   function still() {   // the finished case, without motion

@@ -138,10 +138,11 @@
       <figure class="float flow settle" id="flow">
         <div class="flow-scroll">
           <svg viewBox="0 0 1100 470" role="img" aria-labelledby="flowTitle">
-            <title id="flowTitle">The radiograph goes to the language model. The model calls the morphometry service, which places the landmarks and returns the measurements, and the guideline search, which returns the reference ranges. It then writes the report, in which the numbers come from morphometry and the ranges from the guidelines. The radiologist asks questions and also edits the report directly.</title>
+            <title id="flowTitle">The radiograph goes to the language model. The model calls the morphometry service, which places the landmarks and returns the measurements, and the guideline search, which returns the reference ranges. It then writes the report, in which the numbers come from morphometry and the ranges from the guidelines. The radiologist types a question and also edits the report directly.</title>
             <defs>
               <clipPath id="clipXray"><rect x="20" y="115" width="220" height="220" rx="16"/></clipPath>
               <clipPath id="clipEdit"><rect id="editClip" x="720" y="300" width="400" height="26"/></clipPath>
+              <clipPath id="clipAsk"><rect id="askClip" x="750" y="427" width="400" height="20"/></clipPath>
               <filter id="soft" x="-20%" y="-20%" width="140%" height="160%">
                 <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0e1626" flood-opacity=".12"/>
               </filter>
@@ -252,7 +253,8 @@
               <path d="M726.5 421.5a5.5 5.5 0 1 0 11 0a5.5 5.5 0 1 0-11 0M723 435c2-4 5.5-5.5 9-5.5s7 1.5 9 5.5" class="glyph"/>
               <text class="title" x="756" y="419">Radiologist</text>
               <text class="sub" id="personIdle" x="756" y="441">asks, edits the report and corrects landmarks</text>
-              <text class="sub act" id="personAsk" x="756" y="441">&#8220;Which values are abnormal?&#8221;</text>
+              <text class="sub act" id="personAsk" x="756" y="441" clip-path="url(#clipAsk)">Why is the tibial slope flagged?</text>
+              <rect class="caret" id="caretAsk" x="756" y="429" width="1.6" height="15" rx=".8"/>
               <text class="sub act" id="personEdit" x="756" y="441">writes in the impression directly</text>
             </g>
 
@@ -326,6 +328,6 @@
     </div>
   </footer>
 
-  <script type="module" src="assets/js/site.js?v=2"></script>
+  <script type="module" src="assets/js/site.js?v=3"></script>
 </body>
 </html>
